@@ -4,7 +4,10 @@
 
 import numpy as np
 import time
-import os, glob, shutil
+import random
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+import glob, shutil
 import cv2
 import argparse
 import tensorflow as tf
@@ -69,7 +72,7 @@ class WechatAutoJump(object):
 
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
-        all_vars = tf.all_variables()
+        all_vars = tf.global_variables()
         var_coarse = [k for k in all_vars if k.name.startswith('coarse')]
         var_fine = [k for k in all_vars if k.name.startswith('fine')]
         self.saver_coarse = tf.train.Saver(var_coarse)
@@ -159,6 +162,8 @@ class WechatAutoJump(object):
         press_time = distance * self.sensitivity
         press_time = int(np.rint(press_time))
         press_h, press_w = int(0.82*self.resolution[0]), self.resolution[1]//2
+        press_h += np.random.randint(-30,30)
+        press_w += np.random.randint(-30,30)
         if self.phone == 'Android':
             cmd = 'adb shell input swipe {} {} {} {} {}'.format(press_w, press_h, press_w, press_h, press_time)
             print(cmd)
